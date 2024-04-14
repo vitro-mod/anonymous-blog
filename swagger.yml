@@ -1,0 +1,325 @@
+  openapi: 3.0.3
+  info:
+    title: Анонимный блог - OpenAPI 3.0
+    version: 1.0.0
+  servers:
+    - url: http://localhost/api
+  tags:
+    - name: post
+      description: Методы для работы с записями
+    - name: comment
+      description: Методы для работы с комментариями
+  paths:
+    /posts:
+      post:
+        tags:
+          - post
+        summary: Добавить новую запись
+        operationId: addPost
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          required: true
+        responses:
+          '201':
+            description: Запись успешно добавлена
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: ID добавленной записи
+                      example: 72
+          '400':
+            description: Ошибка при выполнении запроса
+    /posts/{postId}:
+      get:
+        tags:
+          - post
+        summary: Получить запись
+        operationId: getPost
+        parameters:
+          - name: postId
+            in: path
+            description: ID получаемой записи
+            example: 72
+            required: true
+            schema:
+              type: integer
+              format: int32
+        responses:
+          '200':
+            description: Объект записи
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Post'
+          '404':
+            description: Запись не найдена
+
+      # put:
+      #   tags:
+      #     - post
+      #   summary: Редактировать запись
+      #   operationId: updatePost
+      #   parameters:
+      #     - name: postId
+      #       in: path
+      #       description: ID изменяемой записи
+      #       example: 72
+      #       required: true
+      #       schema:
+      #         type: integer
+      #         format: int32
+      #   requestBody:
+      #     content:
+      #       application/json:
+      #         schema:
+      #           $ref: '#/components/schemas/Post'
+      #     required: true
+      #   responses:
+      #     '201':
+      #       description: Запись успешно обновлена
+      #       content:
+      #         application/json:
+      #           schema:
+      #             type: object
+      #             properties:
+      #               id:
+      #                 type: integer
+      #                 description: ID обновлённой записи
+      #                 example: 72
+      #     '400':
+      #       description: Ошибка при выполнении запроса
+      # delete:
+      #   tags:
+      #     - post
+      #   summary: Удалить запись
+      #   operationId: deletePost
+      #   parameters:
+      #     - name: postId
+      #       in: path
+      #       description: ID удаляемой записи
+      #       example: 72
+      #       required: true
+      #       schema:
+      #         type: integer
+      #         format: int32
+      #   responses:
+      #     '204':
+      #       description: Запись успешно удалена
+      #     '400':
+      #       description: Ошибка удаления записи
+    /posts/page/{page}:
+      get:
+        tags:
+          - post
+        summary: Получить записи и комментарии
+        description: Получить список записей и последние 3 комментария к каждой записи. Вывод ограничен максимальным количеством в 15 элементов
+        operationId: getPosts
+        parameters:
+          - name: page
+            in: path
+            description: Номер страницы
+            required: true
+            schema:
+              type: integer
+              format: int32
+        responses:
+          '200':
+            description: Список полученных постов с комментариями к ним
+            content:
+              application/json:
+                schema:
+                  type: array
+                  maxItems: 15
+                  items:
+                    type: object
+                    properties:
+                      post:
+                        $ref: '#/components/schemas/Post'
+                      comments:
+                        type: array
+                        maxItems: 3
+                        items:
+                          $ref: '#/components/schemas/Comment'
+          '400':
+            description: Ошибка при выполнении запроса
+    /posts/{postId}/comments:
+      post:
+        tags:
+          - comment
+        summary: Добавить комментарий к записи
+        operationId: addComment
+        parameters:
+          - name: postId
+            in: path
+            description: ID записи, к которой добавляется комментарий
+            example: 72
+            required: true
+            schema:
+              type: integer
+              format: int32
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          required: true
+        responses:
+          '201':
+            description: Комментарий успешно добавлен
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: ID добавленного комментария
+                      example: 102
+          '400':
+            description: Ошибка при выполнении запроса
+      get:
+        tags:
+          - comment
+        summary: Получить комментарии к записи
+        operationId: getComments
+        parameters:
+          - name: postId
+            in: path
+            description: ID записи для получения комментариев к ней
+            example: 72
+            required: true
+            schema:
+              type: integer
+              format: int32
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+          required: true
+        responses:
+          '200':
+            description: Массив комментариев к записи
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Comment'
+          '404':
+            description: Запись не найдена
+    # /comments/{commentId}:
+    #   put:
+    #     tags:
+    #       - comment
+    #     summary: Редактировать комментарий к записи
+    #     operationId: updateComment
+    #     parameters:
+    #       - name: commentId
+    #         in: path
+    #         description: ID редактируемого комментария
+    #         example: 102
+    #         required: true
+    #         schema:
+    #           type: integer
+    #           format: int32
+    #     requestBody:
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: '#/components/schemas/Comment'
+    #       required: true
+    #     responses:
+    #       '201':
+    #         description: Комментарий успешно изменён
+    #         content:
+    #           application/json:
+    #             schema:
+    #               type: object
+    #               properties:
+    #                 id:
+    #                   type: integer
+    #                   description: ID добавленного комментария
+    #                   example: 102
+    #       '400':
+    #         description: Ошибка при выполнении запроса
+    #   delete:
+    #     tags:
+    #       - comment
+    #     summary: Удалить комментарий к записи
+    #     operationId: deleteComment
+    #     parameters:
+    #       - name: commentId
+    #         in: path
+    #         description: ID удаляемого комментария
+    #         example: 102
+    #         required: true
+    #         schema:
+    #           type: integer
+    #           format: int32
+    #     responses:
+    #       '204':
+    #         description: Комментарий успешно добавлен
+    #         content:
+    #           application/json:
+    #             schema:
+    #               type: object
+    #               properties:
+    #                 id:
+    #                   type: integer
+    #                   description: Комментарий успешно удалён
+    #                   example: 102
+    #       '400':
+    #         description: Ошибка при выполнении запроса
+  components:
+    schemas:
+      Post:
+        required:
+          - author
+          - contents
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+            example: 72
+          author:
+            type: string
+            example: 'username'
+          contents:
+            type: string
+            example: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam tempor ex sed pharetra pulvinar.'
+            minLength: 3
+            maxLength: 5000
+      Comment:
+        required:
+          - postId
+          - author
+          - contents
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+            example: 102
+          postId:
+            type: integer
+            format: int32
+            example: 72
+          author:
+            type: string
+            example: 'username'
+          contents:
+            type: string
+            example: 'Aliquam tempor ex sed pharetra pulvinar.'
+            minLength: 3
+            maxLength: 200

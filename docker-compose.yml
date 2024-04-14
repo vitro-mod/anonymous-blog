@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  nginx:
+    build:
+      context: ./nginx
+    container_name: nginx
+    restart: unless-stopped
+    volumes:
+      - ./app:/var/www
+    depends_on:
+      - php-fpm
+      - database
+    ports:
+      - 80:80
+    networks:
+      - php-stack
+
+  php-fpm:
+    build:
+      context: ./php-fpm
+    container_name: php-fpm
+    restart: unless-stopped
+    environment:
+      - MYSQL_HOST=database
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=mydb
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=password
+    volumes:
+      - ./app:/var/www
+    depends_on:
+      - database
+      - composer
+    networks:
+      - php-stack
+
+  composer:
+      image: "composer"
+      volumes:
+          - "./app:/app"
+      command: install
+
+  database:
+    image: bitnami/mysql:5.7
+    container_name: database
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=mydb
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      - ./database/data.sql:/docker-entrypoint-initdb.d/data.sql
+    networks:
+      - php-stack
+    ports:
+      - 3306:3306
+
+networks:
+  php-stack:
+    name: php-stack

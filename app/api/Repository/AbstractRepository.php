@@ -6,6 +6,7 @@ use App\Core\Database;
 use App\Entities\AbstractEntity;
 use PDO;
 use PDOException;
+use Pecee\SimpleRouter\Exceptions\NotFoundHttpException;
 
 abstract class AbstractRepository
 {
@@ -37,7 +38,13 @@ abstract class AbstractRepository
         $sth = $this->dbConnection->prepare($sql);
         $sth->execute([$id]);
 
-        return $sth->fetchObject($this::ENTITY);
+        $entity = $sth->fetchObject($this::ENTITY);
+
+        if (!$entity) {
+            throw new NotFoundHttpException("Сущность не найдена", 404);
+        }
+
+        return $entity;
     }
 
     public function getAllBy(array $where, int $limit = 0, int $offset = 0): array

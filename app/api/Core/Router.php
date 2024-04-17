@@ -29,11 +29,11 @@ class Router extends SimpleRouter
     private static function setupRoutes(): void
     {
         parent::post('/posts/', 'PostController@create');
-        parent::get('/posts/{postId}', 'PostController@get');
-        parent::get('/posts/page/{page}', 'PostController@getPageWithComments');
+        parent::get('/posts/{postId}', 'PostController@get')->where(['postId' => '[0-9]+']);
+        parent::get('/posts/page/{page}', 'PostController@getPageWithComments')->where(['page' => '[0-9]+']);
 
-        parent::post('/posts/{postId}/comments', 'CommentController@createComment');
-        parent::get('/posts/{postId}/comments', 'CommentController@getCommentsFor');
+        parent::post('/posts/{postId}/comments', 'CommentController@createComment')->where(['postId' => '[0-9]+']);
+        parent::get('/posts/{postId}/comments', 'CommentController@getCommentsFor')->where(['postId' => '[0-9]+']);
 
         parent::error(function (Request $request, Exception $exception) {
             if ($exception instanceof PDOException) {

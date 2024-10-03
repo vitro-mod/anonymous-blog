@@ -4,8 +4,6 @@ namespace App\Controllers;
 
 use App\Core\ApiResponse;
 use App\Core\Router;
-use App\Entities\PostEntity;
-use App\Repository\PostRepository;
 use Pecee\Http\Request;
 use Pecee\Http\Response;
 
@@ -62,7 +60,5 @@ abstract class AbstractController
         return $result;
     }
 
-    protected function validateCreation(): void
-    {
-    }
+    abstract protected function validateCreation(): void;
 }

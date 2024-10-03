@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use App\Core\ApiResponse;
-use App\Entities\PostEntity;
 use App\Exceptions\ValidationException;
 use App\Repository\CommentRepository;
 use App\Repository\PostRepository;
@@ -19,6 +18,7 @@ class PostController extends AbstractController
     public function __construct()
     {
         parent::__construct();
+        
         $this->repository = new PostRepository();
     }
 
@@ -36,7 +36,7 @@ class PostController extends AbstractController
 
         $commentRepository = new CommentRepository();
 
-        $result;
+        $result = [];
         foreach ($posts as $post) {
             $result[] = [
                 'post' => $post,
@@ -45,6 +45,7 @@ class PostController extends AbstractController
         }
 
         $apiResponse = new ApiResponse(null, $result);
+
         $this->response->json($apiResponse);
     }
 

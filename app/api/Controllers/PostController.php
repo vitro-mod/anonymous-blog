@@ -12,27 +12,27 @@ class PostController extends AbstractController
 {
     protected const LIMIT_LENGTH = 5000;
 
-    protected const POSTS_ON_PAGE = 15;
-    protected const COMMENTS_WITH_A_POST = 3;
+    protected const COUNT_POSTS_ON_PAGE = 15;
+    protected const COUNT_COMMENTS_WITH_A_POST = 3;
 
     public function __construct()
     {
         parent::__construct();
-        
+
         $this->repository = new PostRepository();
     }
 
     public function getPageWithComments(int $page)
     {
         $totalRecords = $this->repository->getTotal();
-        $totalPages = ceil($totalRecords / self::POSTS_ON_PAGE);
+        $totalPages = ceil($totalRecords / self::COUNT_POSTS_ON_PAGE);
 
         $page = $page <= 0 ? 1 : $page;
 
         if ($page > $totalPages) throw new InvalidArgumentException('Несуществующая страница', 404);
 
-        $offset = ($page - 1) * self::POSTS_ON_PAGE;
-        $posts = $this->repository->getAll(self::POSTS_ON_PAGE, $offset);
+        $offset = ($page - 1) * self::COUNT_POSTS_ON_PAGE;
+        $posts = $this->repository->getAll(self::COUNT_POSTS_ON_PAGE, $offset);
 
         $commentRepository = new CommentRepository();
 
@@ -40,7 +40,7 @@ class PostController extends AbstractController
         foreach ($posts as $post) {
             $result[] = [
                 'post' => $post,
-                'comments' => $commentRepository->getAllBy(['post_id', $post['id']], self::COMMENTS_WITH_A_POST),
+                'comments' => $commentRepository->getAllBy(['post_id', $post['id']], self::COUNT_COMMENTS_WITH_A_POST),
             ];
         }
 

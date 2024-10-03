@@ -28,7 +28,7 @@ final class Database
 
         try {
             self::$connection = new PDO(
-                "mysql:host=$host; dbname=$database",
+                "mysql:host=$host; port=$port; dbname=$database;",
                 $username,
                 $password
             );
